@@ -1,0 +1,404 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Tinkoff SafeTrades"
+  },
+  "tags": [
+    {
+      "name": "users"
+    },
+    {
+      "name": "trades"
+    },
+    {
+      "name": "transactions"
+    }
+  ],
+  "paths": {
+    "/users/sellers": {
+      "get": {
+        "tags": [
+          "users"
+        ],
+        "summary": "Получить список всех продавцов",
+        "description": "возвращает список всех продавцов в системе.",
+        "responses": {
+          "200": {
+            "description": "Список продавцов",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Seller"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/customers": {
+      "get": {
+        "tags": [
+          "users"
+        ],
+        "summary": "Получить список всех покупателей",
+        "description": "возвращает список всех покупателей в системе.",
+        "responses": {
+          "200": {
+            "description": "Список покупателей",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Customer"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/trades": {
+      "get": {
+        "tags": [
+          "trades"
+        ],
+        "summary": "Получить список всех сделок",
+        "description": "возвращает список всех сделок в системе.",
+        "responses": {
+          "200": {
+            "description": "Список сделок",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Trade"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/trades/newTrade": {
+      "post": {
+        "tags": [
+          "trades"
+        ],
+        "summary": "Создать новую сделку",
+        "description": "создает новую сделку в системе.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Trade"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Сделка успешно создана",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Trade"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/trade/{id}/state": {
+      "patch": {
+        "tags": [
+          "trades"
+        ],
+        "summary": "Обновить статус сделки",
+        "description": "обновляет статус сделки в системе.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "state": {
+                    "type": "string",
+                    "description": "Новый статус сделки"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Статус сделки успешно обновлен",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Trade"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/trades/{id}/completed": {
+      "patch": {
+        "tags": [
+          "trades"
+        ],
+        "summary": "Сигнал о завершении сделки",
+        "description": "Получение сигнала от Тинькофф об успешной транзакции к продавцам",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "completed": {
+                    "type": "boolean",
+                    "description": "Сигнал о завершении сделки"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Cделки успешно завершена",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Trade"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/transactions/{id}/custToTinkoff": {
+      "get": {
+        "tags": [
+          "transactions"
+        ],
+        "summary": "Получить транзакцию от покупателя к Тинькофф по ID сделки",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Транзакция от покупателя к Тинькофф",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransactionCustToTinkoff"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/transactions/{id}/tinkoffToSeller": {
+      "get": {
+        "tags": [
+          "transactions"
+        ],
+        "summary": "Получить все транзакции от Тинькофф к продавцу по ID сделки",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Список транзакций от Тинькофф к продавцу",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TransactionTinkoffToSeller"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Seller": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Уникальный идентификатор продавца"
+          },
+          "name": {
+            "type": "string",
+            "description": "ФИО продавца"
+          },
+          "phone": {
+            "type": "string",
+            "description": "Номер телефона продавца"
+          }
+        }
+      },
+      "Customer": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Уникальный идентификатор покупателя"
+          },
+          "name": {
+            "type": "string",
+            "description": "ФИО покупателя"
+          },
+          "phone": {
+            "type": "string",
+            "description": "Номер телефона покупателя"
+          }
+        }
+      },
+      "Trade": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Уникальный идентификатор сделки"
+          },
+          "sellerId": {
+            "type": "integer",
+            "description": "Идентификатор продавца в сделке"
+          },
+          "customerId": {
+            "type": "integer",
+            "description": "Идентификатор покупателя в сделке"
+          },
+          "product": {
+            "type": "string",
+            "description": "Название товара в сделке"
+          },
+          "amount": {
+            "type": "number",
+            "description": "Сумма сделки"
+          },
+          "paymentType": {
+            "type": "string",
+            "description": "Способ оплаты"
+          },
+          "safeTrade": {
+            "type": "boolean",
+            "description": "Безопасная сделка"
+          },
+          "state": {
+            "type": "string",
+            "description": "Статус сделки, [CREATED, HOLDING, APPROUVED, COMPLITED, CANCELED, FAILED]"
+          },
+          "completed": {
+            "type": "boolean",
+            "description": "Сигнал о завершении сделки"
+          },
+          "cancellationReason": {
+            "type": "string",
+            "description": "Причина отмены сделки"
+          },
+          "cancelledBy": {
+            "type": "string",
+            "description": "Кем отменена сделка"
+          }
+        }
+      },
+      "TransactionCustToTinkoff": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Уникальный идентификатор транзакции"
+          },
+          "tradeId": {
+            "type": "integer",
+            "description": "Идентификатор сделки"
+          },
+          "amount": {
+            "type": "number",
+            "description": "Сумма транзакции"
+          },
+          "state": {
+            "type": "string",
+            "description": "Статус транзакции, [SUCCESS, FAILED]"
+          }
+        }
+      },
+      "TransactionTinkoffToSeller": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Уникальный идентификатор транзакции"
+          },
+          "tradeId": {
+            "type": "integer",
+            "description": "Идентификатор сделки"
+          },
+          "amount": {
+            "type": "number",
+            "description": "Сумма транзакции"
+          },
+          "state": {
+            "type": "string",
+            "description": "Статус транзакции, [SUCCESS, FAILED]"
+          }
+        }
+      }
+    }
+  }
+}
